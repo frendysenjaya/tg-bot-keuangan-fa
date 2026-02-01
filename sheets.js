@@ -2,8 +2,13 @@ import { google } from "googleapis";
 import fs from "fs";
 import moment from "moment";
 
+// const auth = new google.auth.GoogleAuth({
+//   credentials: JSON.parse(fs.readFileSync("credentials.json")),
+//   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+// });
+
 const auth = new google.auth.GoogleAuth({
-  credentials: JSON.parse(fs.readFileSync("credentials.json")),
+  credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
