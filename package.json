@@ -1,0 +1,14 @@
+{
+  "name": "tg-keuangan-bot",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "googleapis": "^171.0.0",
+    "moment": "^2.30.1",
+    "node-telegram-bot-api": "^0.67.0"
+  }
+}
