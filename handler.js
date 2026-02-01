@@ -368,6 +368,97 @@ export async function handleText(bot, msg) {
     }
   }
 
+  // =========================================
+  // REKAP RANGE TANGGAL
+  // /rekap 01-01-2026 ke 31-01-2026
+  // =========================================
+  if (text.startsWith("rekap") && text.includes(" ke ")) {
+    const match = text.match(/rekap\s+(.+)\s+ke\s+(.+)/);
+
+    if (!match) {
+      return bot.sendMessage(
+        chatId,
+        "❌ Format salah\nContoh:\nrekap 01-01-2026 ke 31-01-2026"
+      );
+    }
+
+    const from = parseTanggal(match[1]);
+    const to = parseTanggal(match[2]);
+
+    if (!from.isValid() || !to.isValid()) {
+      return bot.sendMessage(chatId, "❌ Format tanggal tidak valid");
+    }
+
+    const filtered = data
+      .filter(d => {
+        const t = parseTanggal(d.tanggal);
+        return t.isValid() && t.isBetween(from, to, "day", "[]");
+      })
+      .sort((a, b) => parseTanggal(a.tanggal) - parseTanggal(b.tanggal));
+
+    return kirimRekap(
+      bot,
+      chatId,
+      filtered,
+      `📊 Rekap ${from.format("DD-MM-YYYY")} s/d ${to.format("DD-MM-YYYY")}`
+    );
+  }
+
+  // =========================
+  // REKAP KATEGORI RANGE TANGGAL
+  // rekap kategori makan 01-01-2026 ke 31-01-2026
+  // =========================
+  if (lower.startsWith("rekap kategori") && lower.includes(" ke ")) {
+    const match = lower.match(
+      /rekap kategori (.+) (\d{2}[-/]\d{2}[-/]\d{4}) ke (\d{2}[-/]\d{2}[-/]\d{4})/
+    );
+
+    if (!match) {
+      return bot.sendMessage(
+        chatId,
+        "❌ Format salah\nContoh:\nrekap kategori makan 01-01-2026 ke 31-01-2026"
+      );
+    }
+
+    const kategori = match[1].trim();
+    const fromInput = match[2];
+    const toInput = match[3];
+
+    const from = moment(fromInput, ["DD-MM-YYYY", "DD/MM/YYYY"]).startOf("day");
+    const to = moment(toInput, ["DD-MM-YYYY", "DD/MM/YYYY"]).endOf("day");
+
+    if (!from.isValid() || !to.isValid()) {
+      return bot.sendMessage(chatId, "❌ Tanggal tidak valid");
+    }
+
+    if (from.isAfter(to)) {
+      return bot.sendMessage(chatId, "❌ Tanggal awal tidak boleh lebih besar");
+    }
+
+    const filtered = data.filter(d => {
+      const m = moment(d.tanggal, [
+        "DD-MM-YYYY",
+        "DD/MM/YYYY",
+        "YYYY-MM-DD",
+      ]);
+
+      return (
+        d.kategori.toLowerCase() === kategori.toLowerCase() &&
+        m.isValid() &&
+        m.isBetween(from, to, null, "[]")
+      );
+    });
+
+    lastRekap.set(chatId, filtered);
+
+    return kirimRekap(
+      bot,
+      chatId,
+      filtered,
+      `📊 Rekap ${kategori}\n📅 ${from.format("DD-MM-YYYY")} ➜ ${to.format("DD-MM-YYYY")}`
+    );
+  }
+
   // =========================
   // DEFAULT HELP
   // =========================
@@ -385,6 +476,8 @@ export async function handleText(bot, msg) {
     `📊 *Rekap:*\n` +
     `- rekap hari ini\n` +
     `- rekap tanggal 01-01-2026\n` +
+    `- rekap tanggal 01-01-2026 ke 31-01-2026\n` +
+    `- rekap kategori makan 01-01-2026 ke 31-01-2026\n` +
     `- rekap 7 hari terakhir\n` +
     `- rekap bulan januari tahun 2026\n` +
     `- rekap kategori Makan bulan Januari tahun 2026\n` +
@@ -422,4 +515,12 @@ function kirimRekap(bot, chatId, data, title) {
   lines.push("\n💵 TOTAL: " + rupiah(total));
 
   return bot.sendMessage(chatId, `${title}\n\n${lines.join("\n")}`);
+}
+
+function parseTanggal(tgl) {
+  return moment(tgl, [
+    "DD-MM-YYYY",
+    "DD/MM/YYYY",
+    "YYYY-MM-DD",
+  ], true);
 }
