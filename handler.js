@@ -280,7 +280,7 @@ export async function handleText(bot, msg) {
   // rekap kategori makan 01-01-2026 ke 31-01-2026
   // =========================
   if (lower.startsWith("rekap kategori") && lower.includes(" ke ")) {
-    const match = text.match(
+    const match = lower.match(
       /rekap kategori (.+) (\d{2}[-/]\d{2}[-/]\d{4}) ke (\d{2}[-/]\d{2}[-/]\d{4})/
     );
 
@@ -378,7 +378,7 @@ export async function handleText(bot, msg) {
   // rekap tahun 2026
   // =========================
   if (lower.startsWith("rekap tahun")) {
-    const tahun = text.replace("rekap tahun", "").trim();
+    const tahun = lower.replace("rekap tahun", "").trim();
 
     const filtered = data.filter(d =>
       moment(d.tanggal, [
