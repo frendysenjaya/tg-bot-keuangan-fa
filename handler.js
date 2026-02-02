@@ -16,7 +16,7 @@ export async function handleText(bot, msg) {
   // /ADD COMMAND
   // =========================
   if (lower.startsWith("/add")) {
-    const payload = text.replace("/add", "").trim();
+    const payload = lower.replace("/add", "").trim();
 
     if (!payload.includes("|")) {
       return bot.sendMessage(
@@ -76,10 +76,10 @@ export async function handleText(bot, msg) {
   // EDIT DATA PILIH
   // /
   // =========================
-  if (editState.has(chatId) && text.includes("|")) {
+  if (editState.has(chatId) && lower.includes("|")) {
     const row = editState.get(chatId);
     const [tanggal, kategori, barang, harga] =
-      msg.text.split("|").map(v => v.trim());
+      msg.lower.split("|").map(v => v.trim());
 
     await updateRow(row, { tanggal, kategori, barang, harga});
 
@@ -88,7 +88,7 @@ export async function handleText(bot, msg) {
     return bot.sendMessage(chatId, "✅ Data berhasil diperbarui");
   }
 
-  if (text === "/edit") {
+  if (lower === "/edit") {
     const data = lastRekap.get(chatId);
 
     if (!data || !data.length) {
@@ -121,7 +121,7 @@ export async function handleText(bot, msg) {
   // HAPUS DATA PILIH
   // /hapus
   // =========================
-  if (text === "/delete") {
+  if (lower === "/delete") {
     const data = lastRekap.get(chatId);
 
     if (!data || !data.length) {
@@ -154,7 +154,7 @@ export async function handleText(bot, msg) {
   // REKAP HARI INI
   // /rekap hari ini
   // =========================
-  if (text === "rekap hari ini" || text === "rekap hari ini") {
+  if (lower === "rekap hari ini" || lower === "rekap hari ini") {
     const today = moment().format("DD-MM-YYYY");
 
     const filtered = data.filter(d =>
@@ -176,7 +176,7 @@ export async function handleText(bot, msg) {
   // REKAP 7 HARI TERAKHIR
   // /rekap 7 hari terakhir
   // =========================
-  if (text === "rekap 7 hari terakhir" || text === "rekap 7 hari terakhir") {
+  if (lower === "rekap 7 hari terakhir" || lower === "rekap 7 hari terakhir") {
     const today = moment().startOf("day");
     const start = moment().subtract(6, "days").startOf("day");
 
@@ -203,8 +203,8 @@ export async function handleText(bot, msg) {
   // REKAP TANGGAL TERTENTU
   // /rekap 31-01-2026
   // =========================
-  if (text.startsWith("rekap tanggal")) {
-    const tanggalInput = text.replace("rekap tanggal", "").trim();
+  if (lower.startsWith("rekap tanggal")) {
+    const tanggalInput = lower.replace("rekap tanggal", "").trim();
 
     const target = moment(tanggalInput, [
       "DD-MM-YYYY",
@@ -342,7 +342,7 @@ export async function handleText(bot, msg) {
   // KONFIRMASI HAPUS
   // =========================
   if (pendingDelete.has(chatId)) {
-    if (text === "ya") {
+    if (lower === "ya") {
       const target = pendingDelete.get(chatId);
 
       try {
@@ -372,8 +372,8 @@ export async function handleText(bot, msg) {
   // REKAP RANGE TANGGAL
   // /rekap 01-01-2026 ke 31-01-2026
   // =========================================
-  if (text.startsWith("rekap") && text.includes(" ke ")) {
-    const match = text.match(/rekap\s+(.+)\s+ke\s+(.+)/);
+  if (lower.startsWith("rekap") && lower.includes(" ke ")) {
+    const match = lower.match(/rekap\s+(.+)\s+ke\s+(.+)/);
 
     if (!match) {
       return bot.sendMessage(
