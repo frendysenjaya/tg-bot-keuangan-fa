@@ -16,7 +16,7 @@ export async function handleText(bot, msg) {
   // /ADD COMMAND
   // =========================
   if (lower.startsWith("/add")) {
-    const payload = lower.replace("/add", "").trim();
+    const payload = text.replace("/add", "").trim();
 
     if (!payload.includes("|")) {
       return bot.sendMessage(
