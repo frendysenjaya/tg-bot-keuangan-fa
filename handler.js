@@ -76,10 +76,10 @@ export async function handleText(bot, msg) {
   // EDIT DATA PILIH
   // /
   // =========================
-  if (editState.has(chatId) && lower.includes("|")) {
+  if (editState.has(chatId) && text.includes("|")) {
     const row = editState.get(chatId);
     const [tanggal, kategori, barang, harga] =
-      msg.lower.split("|").map(v => v.trim());
+      msg.text.split("|").map(v => v.trim());
 
     await updateRow(row, { tanggal, kategori, barang, harga});
 
